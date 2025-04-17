@@ -6,6 +6,19 @@ function AdSlot({ id, width, height, slotId, siteId, publisherId }) {
   const initialized = useRef(false);
 
   useEffect(() => {
+    // Helper function to load scripts
+    function loadScript(src, callback) {
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = src;
+
+      if (callback) {
+        script.onload = callback;
+      }
+
+      document.head.appendChild(script);
+    }
+
     // Load Prebid.js script
     if (!initialized.current) {
       initialized.current = true;
@@ -23,24 +36,39 @@ function AdSlot({ id, width, height, slotId, siteId, publisherId }) {
         size: `${width}x${height}`,
         type: "banner",
         containerId: id,
-        floorPrice: 0.1,
+        floorPrice: 0,
         position: "article",
       });
 
       // If Prebid.js is not already loaded, load it
       if (!document.getElementById("avano-prebid-script")) {
-        const script = document.createElement("script");
-        script.id = "avano-prebid-script";
-        script.async = true;
-        script.src = "https://cdn.avano.io/prebid.js"; // Your hosted Prebid.js script
-        script.onload = () => {
+        const prebidScript = document.createElement("script");
+        prebidScript.id = "avano-prebid-script";
+        prebidScript.async = true;
+        prebidScript.src =
+          "https://cdn.jsdelivr.net/npm/prebid.js@latest/dist/prebid.js";
+
+        prebidScript.onload = () => {
           console.log("Prebid.js loaded successfully");
-          // If AVANO is initialized, render ads
-          if (window.AVANO && window.AVANO.renderAds) {
-            window.AVANO.renderAds();
-          }
+
+          // Load additional scripts in sequence
+          loadScript(
+            "https://api.avano.io/static/js/avano-prebid-adapter.js",
+            function () {
+              loadScript(
+                "https://api.avano.io/static/js/avano-prebid.js",
+                function () {
+                  // Now that all scripts are loaded, render ads
+                  if (window.AVANO && window.AVANO.renderAds) {
+                    window.AVANO.renderAds();
+                  }
+                }
+              );
+            }
+          );
         };
-        document.head.appendChild(script);
+
+        document.head.appendChild(prebidScript);
       } else {
         // If AVANO is already initialized, render ads
         if (

@@ -15,12 +15,12 @@ function App() {
         <div className="container">
           {/* Leaderboard Ad (728x90) */}
           <AdSlot
-            id="leaderboard-ad"
+            id="avano-ad-6800d271bcffa89820b3b911"
             width={728}
             height={90}
-            slotId="SLOT_ID_1"
-            siteId="SITE_ID"
-            publisherId="PUBLISHER_ID"
+            slotId="6800d271bcffa89820b3b911"
+            siteId="6800ce1542f172b30b04853c"
+            publisherId="6800cd08cdfbc73ccb5215ee"
           />
 
           <div className="content-layout">
